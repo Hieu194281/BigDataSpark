@@ -5,7 +5,8 @@ services:
     container_name: da-spark-master
     build: .
     image: da-spark-image
-    entrypoint: ['./entrypoint.sh', 'master']
+    entrypoint: ["sh", "-c", "./entrypoint.sh master `f"]
+    # command: sh -c './entrypoint master'
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080" ]
       interval: 5s
@@ -25,7 +26,8 @@ services:
   spark-history-server:
     container_name: da-spark-history
     image: da-spark-image
-    entrypoint: ['./entrypoint.sh', 'history']
+    entrypoint: ["sh", "-c", "./entrypoint.sh history"]
+    # command: sh -c './entrypoint history'
     depends_on:
       - spark-master
     env_file:
@@ -38,7 +40,8 @@ services:
   spark-worker:
 #    container_name: da-spark-worker
     image: da-spark-image
-    entrypoint: ['./entrypoint.sh', 'worker']
+    entrypoint: ["sh", "-c", "./entrypoint.sh worker"]
+    # command: sh -c './entrypoint worker'
     depends_on:
       - spark-master
     env_file:
@@ -47,6 +50,59 @@ services:
       - ./book_data:/opt/spark/data
       - ./spark_apps:/opt/spark/apps
       - spark-logs:/opt/spark/spark-events
+  namenode:
+    image: apache/hadoop:3
+    hostname: namenode
+    container_name: hadoop_namenode
+    command: ["hdfs", "namenode"]
+    ports:
+      - "9870:9870"
+    env_file:
+      - ./hadoop.env
+    environment:
+      ENSURE_NAMENODE_DIR: "/tmp/hadoop-root/dfs/name"
+
+  datanode_1:
+    image: apache/hadoop:3
+    container_name: hadoop_datanode_1
+    command: ["hdfs", "datanode"]
+    ports:
+      - "9863:9863"
+    env_file:
+      - ./hadoop.env
+      
+  datanode_2:
+    image: apache/hadoop:3
+    container_name: hadoop_datanode_2
+    command: ["hdfs", "datanode"]
+    ports:
+      - "9864:9864"
+    env_file:
+      - ./hadoop_2.env
+
+  datanode_3:
+    image: apache/hadoop:3
+    container_name: hadoop_datanode_3
+    command: ["hdfs", "datanode"]
+    ports:
+      - "9865:9865"
+    env_file:
+      - ./hadoop_3.env
+
+  resourcemanager:
+    image: apache/hadoop:3
+    hostname: resourcemanager
+    command: ["yarn", "resourcemanager"]
+    ports:
+        - 8088:8088
+    env_file:
+      - ./hadoop.env
+
+  nodemanager:
+    image: apache/hadoop:3
+    command: ["yarn", "nodemanager"]
+    env_file:
+      - ./hadoop.env
 
 volumes:
   spark-logs:
