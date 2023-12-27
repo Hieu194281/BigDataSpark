@@ -61,6 +61,7 @@ You can also submit a custom job:
 ```shell
 make submit-yarn-cluster app=data_analysis_book/chapter03/word_non_null.py
 ```
+docker exec da-spark-master spark-submit --master spark://spark-master:7077 --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.3 --deploy-mode client ./apps/data_analysis_book/testKafka.py 
 
 There are a number of commands to build the cluster,
 you should check the Makefile to see them all. But the
