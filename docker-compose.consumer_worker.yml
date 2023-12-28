@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  consumer_worker_1:
+    image: consumer_worker:1.0
+    hostname: consumer_worker_1
+    container_name: consumer_worker_1
+    environment:
+      BOOTSTRAP_SERVERS: "localhost:9092"
+      TOPIC: "product"
+      HDFS_DIR_PATH: "/product"
+      HDFS_URL: "http://localhost:9870"
+      CONSUMER_ID: 1
+    restart: unless-stopped
+  
+  consumer_worker_2:
+    image: consumer_worker:1.0
+    hostname: consumer_worker_2
+    container_name: consumer_worker_2
+    environment:
+      BOOTSTRAP_SERVERS: "localhost:9092"
+      TOPIC: "product"
+      HDFS_DIR_PATH: "/product"
+      HDFS_URL: "http://localhost:9870"
+      CONSUMER_ID: 2
+    restart: unless-stopped
+  
+  consumer_worker_3:
+    image: consumer_worker:1.0
+    hostname: consumer_worker_3
+    container_name: consumer_worker_3
+    environment:
+      BOOTSTRAP_SERVERS: "localhost:9092"
+      TOPIC: "product"
+      HDFS_DIR_PATH: "/product"
+      HDFS_URL: "http://localhost:9870"
+      CONSUMER_ID: 3
+    restart: unless-stopped
+  
+  consumer_worker_4:
+    image: consumer_worker:1.0
+    hostname: consumer_worker_4
+    container_name: consumer_worker_4
+    environment:
+      BOOTSTRAP_SERVERS: "localhost:9092"
+      TOPIC: "product"
+      HDFS_DIR_PATH: "/product"
+      HDFS_URL: "http://localhost:9870"
+      CONSUMER_ID: 4
+    restart: unless-stopped
