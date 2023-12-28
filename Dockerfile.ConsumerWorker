@@ -24,7 +24,7 @@ COPY spark_apps/data_analysis_book/consumer_worker.py .
 RUN chmod +x consumer_worker.py
 
 ARG BOOTSTRAP_SERVERS
-ENV BOOTSTRAP_SERVERS = ${BOOTSTRAP_SERVERS:-"localhost:29092"}
+ENV BOOTSTRAP_SERVERS = ${BOOTSTRAP_SERVERS:-"kafka:29092"}
 
 ARG TOPIC
 ENV TOPIC = ${TOPIC:-"product"}
@@ -33,7 +33,7 @@ ARG HDFS_DIR_PATH
 ENV HDFS_DIR_PATH = ${HDFS_DIR_PATH:-"/product"}
 
 ARG HDFS_URL
-ENV HDFS_URL = ${HDFS_URL:-"http://localhost:9870"}
+ENV HDFS_URL = ${HDFS_URL:-"http://namenode:9870"}
 
 ARG CONSUMER_ID
 ENV CONSUMER_ID = ${CONSUMER_ID:-1}
