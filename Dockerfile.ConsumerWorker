@@ -20,7 +20,8 @@ WORKDIR ${CONSUMER_HOME}
 
 COPY requirements/requirements_consumer.txt .
 RUN pip3 install -r requirements_consumer.txt
-COPY spark_apps/data_analysis_book/consumer_worker.py
+COPY spark_apps/data_analysis_book/consumer_worker.py .
+RUN chmod +x consumer_worker.py
 
 ARG BOOTSTRAP_SERVERS
 ENV BOOTSTRAP_SERVERS = ${BOOTSTRAP_SERVERS:-"localhost:29092"}
