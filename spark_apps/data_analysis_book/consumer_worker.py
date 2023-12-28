@@ -1,6 +1,7 @@
 from confluent_kafka import Consumer, KafkaError
 from confluent_kafka.admin import AdminClient, NewTopic
 from hdfs import InsecureClient
+import os
 import json
 import time
 
@@ -11,6 +12,11 @@ MAPPING_ACTION_TO_POINT = {
     'buy': 15
 }
 
+bootstrap_servers = os.environ['BOOTSTRAP_SERVERS']
+topic = os.environ['TOPIC']
+dir_path = os.environ['HDFS_DIR_PATH']
+hdfs_url = os.environ['HDFS_URL']
+consumer_id = os.environ['CONSUMER_ID']
 
 def create_topic(bootstrap_servers, topic_name, partitions=1, replication_factor=1):
     admin_client = AdminClient({'bootstrap.servers': bootstrap_servers})
@@ -31,6 +37,7 @@ def create_topic(bootstrap_servers, topic_name, partitions=1, replication_factor
 
     admin_client = None
 
+
 def topic_exists(bootstrap_servers, topic_name):
     admin_client = AdminClient({'bootstrap.servers': bootstrap_servers})
 
@@ -48,44 +55,34 @@ def topic_exists(bootstrap_servers, topic_name):
     # Close the AdminClient
     admin_client = None
 
-def checkExistFolder(client, pathCheck): 
-    if(client.status(pathCheck, strict=False)):
-        return True
-    else: return False
 
 def write_to_hdfs(needed_information):
-    hdfs_client = InsecureClient('http://localhost:9870', user='root')
     try: 
         data = json.dumps(needed_information)  # Convert to JSON string
         data = data.encode('utf-8')  # Convert to bytes
-        dir_path = '/product'
+        # dir_path = '/product'
         timestamp = time.time()
-        # hdfs_client.set_permission('/', permission=0o777)
-        # hdfs_client.chmod('/', 0o777)
-        # if(not checkExistFolder(hdfs_client, dir_path)): 
-        #     hdfs_client.makedirs(dir_path)
-        #     # hdfs_client.chmod(dir_path, 0o777)
-        #     hdfs_client.set_permission(dir_path, permission=0o777)
-        #     print(f"Directory '{dir_path}' created successfully in HDFS.")
 
-        file_path = f'/product/product_{str(timestamp)}.json'
+        file_path = f'/{dir_path}/product_{consumer_id}_{str(timestamp)}.json'
         
         with hdfs_client.write(file_path) as writer:
             writer.write(data)
     except Exception as e: 
         print(f'Error when writing to HDFS: {e}')
 
-if(not topic_exists('localhost:29092', 'product')): 
-    create_topic('localhost:29092', 'product', 4)
+if(not topic_exists(bootstrap_servers, topic)): 
+    create_topic(bootstrap_servers, topic, 4, 2)
 
 c = Consumer({
-    'bootstrap.servers': 'localhost:29092',
+    'bootstrap.servers': bootstrap_servers,
     'group.id': 'mygroup',
     'auto.offset.reset': 'earliest',
     'enable.auto.commit': True
 })
 
-c.subscribe(['product'])
+c.subscribe([topic])
+
+hdfs_client = InsecureClient(hdfs_url, user='root')
 
 print("Recommend Consumer Starting")
 while True:
